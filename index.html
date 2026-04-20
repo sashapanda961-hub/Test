@@ -541,19 +541,16 @@ async function hashKey(str){
 let isPro = false;
 
 function loadPro(){
-  try{
-    const stored = localStorage.getItem('__rcl_pro');
-    if(stored && PRO_KEYS_HASHED.includes(stored)){
-      isPro = true;
-    }
-  }catch(e){}
+  // Ничего не читаем из памяти, просто обновляем интерфейс 
+  // (при запуске isPro всегда будет false)
+  updateProUI();
 }
 
 async function activatePro(key){
   const h = await hashKey(key.trim());
   if(PRO_KEYS_HASHED.includes(h)){
     isPro = true;
-    try{ localStorage.setItem('__rcl_pro', h); }catch(e){}
+    // Строку с localStorage.setItem мы просто удалили
     updateProUI();
     showToast();
     closePaywall();
@@ -1124,75 +1121,6 @@ function loadTheme(){
 // ══════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════
-
-// ════════════════════════════════════════════════
-//  CALC THEMES
-// ════════════════════════════════════════════════
-const THEMES = [
-  { id:'classic', name:'KLASSISCH',
-    disp:'#ffffff', num:'#e8e8e3', fn:'#d8d8d3', op:'#c8c8c3', eq:'#2d6be4', tx:'#1a1a1a', bg:'#f5f5f0' },
-  { id:'dark',    name:'DUNKEL',
-    disp:'#111111', num:'#2a2a2a', fn:'#222222', op:'#1e1e1e', eq:'#2d6be4', tx:'#f0f0f0', bg:'#1a1a1a' },
-  { id:'midnight',name:'NACHT',
-    disp:'#05050f', num:'#0f0f22', fn:'#0a0a18', op:'#080818', eq:'#3a2a8a', tx:'#7b8cde', bg:'#0a0a1a' },
-  { id:'rose',    name:'ROSA',
-    disp:'#fff5f7', num:'#fde8ed', fn:'#f8d8e0', op:'#f0c0cc', eq:'#c0304a', tx:'#7a1a30', bg:'#fdf0f3' },
-  { id:'mint',    name:'MINT',
-    disp:'#f8fffc', num:'#e0f5ec', fn:'#d0eee0', op:'#b0e8cc', eq:'#1a8a50', tx:'#0a4a28', bg:'#f0faf5' },
-  { id:'sand',    name:'SAND',
-    disp:'#fffdf5', num:'#f5ece0', fn:'#ede0cc', op:'#e8d8b0', eq:'#c87030', tx:'#4a3010', bg:'#faf5ec' },
-];
-
-let curTheme = 'classic';
-
-function loadTheme(){
-  try{ curTheme = localStorage.getItem('__rcl_theme') || 'classic'; }catch(e){}
-  applyTheme(curTheme);
-}
-
-function applyTheme(id){
-  curTheme = id;
-  // remove all theme classes
-  THEMES.forEach(t => document.body.classList.remove('theme-'+t.id));
-  if(id !== 'classic') document.body.classList.add('theme-'+id);
-  try{ localStorage.setItem('__rcl_theme', id); }catch(e){}
-  renderThemeButtons();
-}
-
-function openThemes(){
-  renderThemeButtons();
-  document.getElementById('theme-modal').classList.add('show');
-}
-function closeThemes(){
-  document.getElementById('theme-modal').classList.remove('show');
-}
-
-function renderThemeButtons(){
-  const grid = document.getElementById('tm-grid');
-  if(!grid) return;
-  grid.innerHTML = '';
-  THEMES.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'tm-btn' + (t.id === curTheme ? ' ath' : '');
-    btn.onclick = () => applyTheme(t.id);
-    btn.innerHTML = \`
-      <div class="tm-preview" style="background:\${t.bg}">
-        <div class="tm-prev-disp" style="background:\${t.disp};color:\${t.tx}">42</div>
-        <div class="tm-prev-btns">
-          <div class="tm-prev-btn" style="background:\${t.fn}"></div>
-          <div class="tm-prev-btn" style="background:\${t.fn}"></div>
-          <div class="tm-prev-btn" style="background:\${t.fn}"></div>
-          <div class="tm-prev-btn" style="background:\${t.op}"></div>
-          <div class="tm-prev-btn" style="background:\${t.num}"></div>
-          <div class="tm-prev-btn" style="background:\${t.num}"></div>
-          <div class="tm-prev-btn" style="background:\${t.num}"></div>
-          <div class="tm-prev-btn" style="background:\${t.eq}"></div>
-        </div>
-      </div>
-      \${t.name}\`;
-    grid.appendChild(btn);
-  });
-}
 loadPro();
 updateProUI();
 loadTheme();
